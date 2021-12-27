@@ -1,6 +1,8 @@
 import pymongo
 import mysql.connector
 import pymysql
+from sqlalchemy import create_engine
+import credential_handler
 
 
 def connect_to_mongo(credentials):
@@ -21,6 +23,9 @@ def connect_to_sql(credentials):
     return connection
 
 
-def insert_df_to_sql(df, connection):
-    connect_to_sql()
+def insert_df_to_sql(df, table_name):
+    credentials = credential_handler.read_credentials()
+    engine = create_engine(credentials['sql']['database_connection_string'])
+    df.to_sql(table_name, con=engine, if_exists='replace')
+
 

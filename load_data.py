@@ -1,12 +1,10 @@
 import requests
 import pandas as pd
 import database_connection
-import credential_handler
-
-credentials = credential_handler.read_credentials()
+import pprint
 
 
-def load_player_bio(credentials):
+def load_player_bio():
     complete_player_list = []
     for start in range(0, 9):
         headers = {}
@@ -23,18 +21,36 @@ def load_player_bio(credentials):
         complete_player_list += r.json()['data']
     bio_df = pd.DataFrame.from_dict(complete_player_list)
     print(bio_df)
-    ## Connect to SQL
-    connection = database_connection.connect_to_sql(credentials['sql'])
-
-    database_connection.insert_df_to_sql(bio_df, connection)
+    # Insert DF into the table (however that gets done...)
+    database_connection.insert_df_to_sql(bio_df, 'players')
 
 
+def load_schedule():
+    game_ids = []
+    headers = {}
+    params = {
+        "startDate": "2021-07-21",
+        "endDate": "2022-07-21",
+        "hydrate": "team, linescore, game(content(media(epg)), seriesSummary), seriesSummary(series)",
+        "site": "en_nhl"
+    }
+    r = requests.get("https://statsapi.web.nhl.com/api/v1/schedule", headers=headers, params=params)
+    schedule = r.json()['dates']
+    # pprint.pprint(schedule)
+    for game_day in schedule:
+        for game in game_day['games']:
+            game_ids.append(game['gamePk'])
+            # pprint.pprint(game['gamePk'])
+    schedule_df = pd.DataFrame(data={'gamePk': game_ids})
+    print(schedule_df)
+    database_connection.insert_df_to_sql(schedule_df, 'games')
 
 
 
-# def load_shot_data():
+
+# def load_shot():
     # TODO
 
 
-# def load_goal_data():
+# def load_goal():
     # TODO
