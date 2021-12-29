@@ -43,9 +43,29 @@ def load_schedule():
             # pprint.pprint(game['gamePk'])
     schedule_df = pd.DataFrame(data={'gamePk': game_ids})
     print(schedule_df)
-    database_connection.insert_df_to_sql(schedule_df, 'games')
+    database_connection.insert_df_to_sql(schedule_df, 'game_ids')
 
 
+def load_teams():
+    headers = {}
+    # sort=fullName&include=lastSeason.id&include=firstSeason.id
+    params = {
+        "sort": "fullName",
+        "include": "lastSeason.id",
+    }
+    r = requests.get("https://api.nhle.com/stats/rest/en/franchise", headers=headers, params=params)
+    teams = [team for team in r.json()['data'] if team['lastSeason'] is None]
+    for team in teams:
+        team.pop('lastSeason', None)
+    teams_df = pd.DataFrame(teams)
+    print(teams_df)
+    database_connection.insert_df_to_sql(teams_df, 'teams', action='replace')
+
+
+
+# Loading game data based off of the game id
+# def load_game():
+    # TODO
 
 
 # def load_shot():

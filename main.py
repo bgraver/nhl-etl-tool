@@ -20,4 +20,8 @@ else:
 '''
 
 
-load_data.load_player_bio(credentials)
+# load_data.load_player_bio()
+# load_data.load_schedule()
+# load_data.load_teams()
+
+

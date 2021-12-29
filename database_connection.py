@@ -23,9 +23,9 @@ def connect_to_sql(credentials):
     return connection
 
 
-def insert_df_to_sql(df, table_name):
+def insert_df_to_sql(df, table_name, action="append"):
     credentials = credential_handler.read_credentials()
     engine = create_engine(credentials['sql']['database_connection_string'])
-    df.to_sql(table_name, con=engine, if_exists='replace')
+    df.to_sql(table_name, con=engine, if_exists=action)
 
 
